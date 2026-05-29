@@ -9,14 +9,14 @@ Follow these steps to integrate individual components into your store.
 Add the following `<script>` tag to the HTML page where you want to use the components. Place it at the bottom of the `<body>` element for optimal performance.
 
 ```html
-<script src="https://assets.gigit-ai.com/gigit-components@latest.js" type="module" async></script>
+<script src="provided-script-url" type="module" async></script>
 ```
 
-You can also pin to a specific version if needed:
+The script URL will be shared with you during onboarding. You can also pin to a specific version if needed.
 
-```html
-<script src="https://assets.gigit-ai.com/gigit-components@1.2.3.js" type="module" async></script>
-```
+#### **For Non-Shopify Platforms**
+
+For stores not on Shopify, use your store's domain (e.g., `www.yourbrand.com`) as the `shop` attribute value. The script and components work the same way — add the script to your site's HTML and place components where needed.
 
 #### **For Shopify Stores (Native Liquid Themes)**
 
@@ -25,19 +25,19 @@ On Shopify, add this script to `layout/theme.liquid` or any other **Liquid file 
 Example (`theme.liquid`):
 
 ```html
-<script src="https://assets.gigit-ai.com/gigit-components@latest.js" type="module" async></script>
+<script src="provided-script-url" type="module" async></script>
 ```
 
-#### **For Shopify Stores Using Page Builders (Replo, Jurni, etc.)**
+#### **For Shopify Stores Using Page Builders (e.g., Replo)**
 
-If you're using a page builder like Replo or Jurni on Shopify, the Gigit app is installed through the Shopify App Store as usual (this gives you the core backend, analytics, and checkout pixel). The web component script handles the frontend rendering.
+If you're using a page builder on Shopify, the Gigit app is installed through the Shopify App Store as usual (this gives you the core backend, analytics, and checkout pixel). The web component script handles the frontend rendering.
 
 **Setup Steps:**
 
 1. **Install the Gigit Shopify App** — this installs the backend services, event tracking pixel, and analytics infrastructure.
 2. **Add the web component script** — insert the script tag in your page builder's custom code section (usually in the `<head>` or before `</body>`):
    ```html
-   <script src="https://assets.gigit-ai.com/gigit-components@latest.js" type="module" async></script>
+   <script src="provided-script-url" type="module" async></script>
    ```
 3. **Place web components** — use the custom HTML elements documented below anywhere in your page builder's layout.
 
@@ -46,7 +46,6 @@ If you're using a page builder like Replo or Jurni on Shopify, the Gigit app is 
 | Page Builder | Where to Add Script |
 | ------------ | ------------------- |
 | **Replo** | Page Settings → Custom Code → Footer Code |
-| **Jurni** | Global Settings → Custom Scripts → Before `</body>` |
 
 **Important Notes for Page Builder Users:**
 
@@ -54,7 +53,6 @@ If you're using a page builder like Replo or Jurni on Shopify, the Gigit app is 
 - The web component script works independently of Shopify's theme extension system — no theme blocks needed.
 - Analytics events (`ADD_TO_CART`, `CHECKOUT_COMPLETED`) must be tracked manually using `GigitApps.trackEvent` (see [Data Tracking](#data-tracking-for-analytics) section below).
 - The checkout pixel is installed automatically via the Shopify app — no additional setup needed for conversion tracking.
-- For Storefront Agent with element swap, the CSS selectors you configure target elements in your page builder's rendered HTML.
 
 ---
 
@@ -91,7 +89,7 @@ The QA Widget enables AI-powered Q&A for answering customer questions.
 
 | **Attribute**        | **Required?** | **Type** | **Description**                                                                                                               |
 | -------------------- | ------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `shop`               | ✅ Yes        | `string` | The domain of your store.                                                                                                     |
+| `shop`               | ✅ Yes        | `string` | Your store's domain (e.g., `your-store.myshopify.com` for Shopify, or your store domain for non-Shopify platforms).           |
 | `producttitle`       | Optional      | `string` | The name of the product.                                                                                                      |
 | `productid`          | Optional      | `string` | Enables product-specific chat if provided.                                                                                    |
 | `productdescription` | Optional      | `string` | The description of the product. Required on product pages.                                                                    |
@@ -247,11 +245,11 @@ The Shop Concierge provides AI-driven customer assistance.
 
 ### **Gigit Storefront Agent**
 
-The Storefront Agent dynamically renders personalized content based on visitor context (device, visitor type, UTM parameters, page type). It supports multiple content types including text, images, banners, custom HTML, and element swaps.
+The Storefront Agent dynamically renders personalized content based on visitor context (device, visitor type, UTM parameters, page type). It supports multiple content types including text, images, banners, and custom HTML.
 
-#### **Site-Wide Deployment (Recommended for Element Swap)**
+#### **Site-Wide Deployment**
 
-For element swap, place a single element in your site layout (e.g., `theme.liquid` or global footer). It auto-detects the current page and applies configured swaps — no per-page agent ID needed.
+Place a single element in your site layout (e.g., `theme.liquid` or global footer). It auto-detects the current page and applies configured behaviors — no per-page agent ID needed.
 
 ```html
 <gigit-storefront-agent shop="your-store.myshopify.com"></gigit-storefront-agent>
@@ -277,7 +275,7 @@ For content types that render visible output (text, image, banner, custom_html),
 ></gigit-storefront-agent>
 ```
 
-#### **Usage in Replo / Jurni / Page Builders**
+#### **Usage in Page Builders (e.g., Replo)**
 
 Place the custom HTML element in any section of your page builder where you want dynamic content to appear:
 
@@ -295,26 +293,11 @@ Place the custom HTML element in any section of your page builder where you want
 
 | **Attribute**  | **Required?** | **Type** | **Description**                                                                                  |
 | -------------- | ------------- | -------- | ------------------------------------------------------------------------------------------------ |
-| `shop`         | ✅ Yes        | `string` | Your store's permanent domain (e.g., `your-store.myshopify.com`).                                |
+| `shop`         | ✅ Yes        | `string` | Your store's domain (e.g., `your-store.myshopify.com` for Shopify, or your store domain for non-Shopify platforms). |
 | `agentid`      | Optional      | `string` | Agent ID from the Gigit Dashboard. If omitted, auto-detects agents for the current page URL.     |
 | `pagetype`     | Optional      | `string` | Page type context: `index`, `product`, `collection`, `page`, `blog`, `cart`. Defaults to `index`. |
 | `productid`    | Optional      | `string` | The product ID. Required on product pages for product-aware behaviors.                           |
 | `producttitle` | Optional      | `string` | The product title. Required on product pages for product-aware behaviors.                        |
-
-#### **How It Works**
-
-**With `agentid` (per-page mode):**
-1. On page load, the component sends a request to the Gigit backend with visitor context (device type, new/returning visitor, UTM params, page type).
-2. The backend evaluates configured behaviors for that specific agent and returns the appropriate content.
-3. The component renders the content or performs DOM modifications (for element swap type).
-
-**Without `agentid` (site-wide mode):**
-1. On page load, the component sends the store domain + current page URL to the evaluation endpoint.
-2. The backend matches the URL against all configured element_swap agents for the store and evaluates visitor signals.
-3. If behaviors match, the component applies DOM swaps for all matching agents on the current page.
-4. If no agent is configured for the current page, the component does nothing (no errors, no layout shift).
-
-Analytics events (`SFA_EVALUATION`, `SFA_IMPRESSION`) are tracked automatically in both modes.
 
 #### **Content Types**
 
@@ -326,68 +309,8 @@ The Storefront Agent supports the following content types (configured in the Gig
 | `image`        | Renders a responsive image (separate mobile/desktop URLs supported).     |
 | `banner`       | Full-width banner with optional overlay title.                           |
 | `custom_html`  | Renders arbitrary HTML content.                                          |
-| `element_swap` | Replaces or modifies existing DOM elements on the page (see below).      |
 
----
-
-### **Element Swap (Storefront Agent Feature)**
-
-Element swap is a powerful content type that allows the Storefront Agent to modify existing elements on the page without rendering a visible widget. It targets elements using CSS selectors and replaces their content in-place.
-
-#### **How Element Swap Works**
-
-1. Place the `<gigit-storefront-agent>` element anywhere on the page (it renders nothing visually for element swap).
-2. Configure swap targets in the Gigit Dashboard with CSS selectors pointing to elements in your page builder's HTML.
-3. When the agent evaluates and triggers, it finds the target elements and swaps their content.
-
-#### **Swap Target Types**
-
-| Type          | Behavior                                                                                         |
-| ------------- | ------------------------------------------------------------------------------------------------ |
-| `image`       | Replaces the `src` of an `<img>` element. Clears `srcset` and removes `<source>` tags in `<picture>`. |
-| `text`        | Replaces the inner content of an element with new HTML.                                          |
-| `product_row` | Injects HTML **above** the targeted element (useful for inserting product rows into grids).       |
-
-#### **Features**
-
-- **Multi-element targeting** — Comma-separated selectors (e.g., `.heading--desktop, .heading--mobile`) swap all matching elements.
-- **Responsive images** — Different images for mobile (< 768px) and desktop.
-- **Link URL updates** — Can update the `href` on anchor elements.
-- **Idempotent** — Elements are marked with `data-gigit-swap` to prevent duplicate swaps.
-
-#### **Page Builder Tips for Element Swap**
-
-When using element swap with Replo or Jurni:
-
-1. **Identify target CSS selectors** — Use your browser's DevTools (right-click → Inspect) to find stable CSS selectors for elements you want to swap.
-2. **Use class names or IDs** — Prefer selectors like `.hero-heading`, `#main-banner img`, or `[data-section="hero"] h1` that won't change between page loads.
-3. **Place the agent block on the same page** — The `<gigit-storefront-agent>` element must be present on the page where swaps should happen, even though it renders nothing visible. Alternatively, use site-wide mode (omit `agentid`) to cover all pages automatically.
-4. **Test with preview mode** — Use the Gigit Dashboard preview to verify selectors match before going live.
-
-#### **Example: Site-Wide Element Swap**
-
-```html
-<!-- Place once in your site's global layout — covers all configured pages -->
-<gigit-storefront-agent
-    shop="your-store.myshopify.com"
-></gigit-storefront-agent>
-```
-
-#### **Example: Per-Page Element Swap in Replo**
-
-```html
-<!-- Place this anywhere in your Replo page (e.g., in a hidden section or at the bottom) -->
-<gigit-storefront-agent
-    agentid="agent_abc123"
-    shop="your-store.myshopify.com"
-    pagetype="index"
-></gigit-storefront-agent>
-```
-
-Then in the Gigit Dashboard, configure an element swap behavior targeting:
-- Selector: `.hero-section img` (targets the hero image in your Replo layout)
-- Type: `image`
-- Content: Your personalized image URLs for desktop and mobile
+Analytics events are tracked automatically.
 
 ---
 
