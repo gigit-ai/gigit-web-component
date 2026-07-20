@@ -318,16 +318,98 @@ Analytics events are tracked automatically.
 
 `GigitApps` is a global object that provides tracking functionality for user interactions in your store. It allows developers to log important actions such as adding a product to the cart or completing a checkout.
 
-`GigitApps` does not track events automatically (except page views). **The developer must manually call `GigitApps.trackEvent`** when relevant user actions occur.
+Aside from a single automatic `PAGE_VIEWED` event fired on load when the component
+script is present (non-playground), `GigitApps` does not track events automatically.
+**The developer must manually call `GigitApps.trackEvent`** for `ADD_TO_CART` and
+`CHECKOUT_COMPLETED` when the relevant user actions occur.
+
+---
+
+## **Test / QA Mode**
+ By default, events fired from QA/Test environments — including conversions from test checkouts — land in the production
+analytics and are counted as real revenue.
+
+**Test / QA mode** marks events as test traffic so they are automatically **excluded
+from production analytics**. Use it on:
+
+- QA / staging deployments that share the production bundle.
+- Test pages hosted on your production domain.
+
+Turn it on once, on the environment you want excluded, with the queue-safe snippet below.
+Because the bundle loads `async`, it can initialize (and fire its automatic page view)
+before an inline script placed *after* it runs. **Set the config before the component
+script** so the flag is in place when the bundle initializes. The snippet stashes the
+config on `window.GigitApps._config`, which the bundle drains on init before the automatic
+page view:
+
+```html
+<script>
+  window.GigitApps = window.GigitApps || {}
+  window.GigitApps.configure
+    ? window.GigitApps.configure({ test: true })
+    : (window.GigitApps._config = { test: true })
+</script>
+<script src="https://assets.gigit-ai.com/gigit-components@latest.js" type="module" async></script>
+```
+
+Once configured, **all** events (`ADD_TO_CART`, `CHECKOUT_COMPLETED`, `PAGE_VIEWED`) fired
+from that environment are marked as test traffic. You can still override the flag on a
+single call (see the `trackEvent` precedence table below).
+
+---
+
+## **Global Configuration — `GigitApps.configure()`**
+
+`GigitApps.configure(options)` sets defaults that apply to every subsequent `trackEvent`
+call.
+
+```js
+window.GigitApps.configure({ test: true })
+```
+
+#### **Options**
+
+| **Option** | **Type**  | **Default** | **Description**                                                                 |
+| ---------- | --------- | ----------- | ------------------------------------------------------------------------------- |
+| `test`     | `boolean` | `false`     | When `true`, marks events as test/QA traffic so they are excluded from analytics. |
+
+**Async / load-order note:** the component script is loaded with `async`, so an inline
+`configure()` call may run before the bundle defines the method. Use the queue-safe guard
+shown in [Test / QA Mode](#test--qa-mode) — assign to `window.GigitApps._config` when
+`configure` is not yet available, and the bundle will apply it on init. A non-boolean
+`test` value is ignored.
 
 ---
 
 ## **Tracking Events with GigitApps.trackEvent**
 
-`GigitApps.trackEvent(eventType, eventData)` is used to send event tracking data.
+`GigitApps.trackEvent(eventType, eventData, options)` is used to send event tracking data.
 
 -   **`eventType` (string, required)** → The name of the event (e.g., `"ADD_TO_CART"`).
 -   **`eventData` (object, optional)** → Additional details about the event.
+-   **`options` (object, optional)** → Per-call overrides. Supports `test: boolean` to mark
+    (or force off) test/QA traffic for this single event.
+
+#### **`options.test` precedence**
+
+The resolved test flag for each call is determined in this order:
+
+| **Priority** | **Source**                             | **Applies when**                          |
+| ------------ | -------------------------------------- | ----------------------------------------- |
+| 1 (highest)  | `options.test` (per-call third arg)    | `typeof options.test === 'boolean'`       |
+| 2            | Global config from `configure({ test })` | a global default has been set             |
+| 3 (default)  | `false`                                | nothing set                               |
+
+The strict boolean check means an **omitted** third argument falls through to the global
+config, while an explicit value overrides it in either direction:
+
+```js
+// Force this one event to be test traffic, even on a production deployment:
+window.GigitApps.trackEvent('CHECKOUT_COMPLETED', payload, { test: true })
+
+// Force this one event to be real, even on a test-default deployment:
+window.GigitApps.trackEvent('CHECKOUT_COMPLETED', payload, { test: false })
+```
 
 ---
 
